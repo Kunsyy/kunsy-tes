@@ -707,12 +707,12 @@ local function setTradeTextBoxValue(textBox, desiredText, mode)
 
     -- 1. Focus
     textBox:CaptureFocus()
-    task.wait(0.08)
+    task.wait(0.03)
 
     -- 2. Set text langsung
     textBox.Text = tostring(desiredText or "")
     textBox.CursorPosition = #tostring(desiredText or "") + 1
-    task.wait(0.05)
+    task.wait(0.02)
 
     -- 3. Fire signal
     pcall(function()
@@ -720,13 +720,13 @@ local function setTradeTextBoxValue(textBox, desiredText, mode)
             firesignal(textBox:GetPropertyChangedSignal("Text"))
         end
     end)
-    task.wait(0.05)
+    task.wait(0.02)
 
     -- 4. Tekan Enter
     VIM_SERVICE:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-    task.wait(0.03)
+    task.wait(0.015)
     VIM_SERVICE:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-    task.wait(0.05)
+    task.wait(0.02)
 
     -- 5. Release focus
     textBox:ReleaseFocus(true)
@@ -735,7 +735,7 @@ local function setTradeTextBoxValue(textBox, desiredText, mode)
             firesignal(textBox.FocusLost, true)
         end
     end)
-    task.wait(0.15)
+    task.wait(mode == "qty" and 0.08 or 0.06)
 
     local currentValue = tostring(textBox.Text or "")
     local currentNormalized = mode == "qty"
@@ -952,7 +952,7 @@ local function putSelectedItems(selectedItems)
             local addBtn = findAddToTradeButton(tradeUI)
             if addBtn then
                 clickButton(addBtn)
-                task.wait(1.0)
+                task.wait(0.5)
                 popup = tradeUI:FindFirstChild("InventoryPopup", true)
             end
         end
@@ -1024,7 +1024,7 @@ local function putSelectedItems(selectedItems)
         print("[PUT] Search result: " .. tostring(searchResult))
 
         -- Tunggu inventory ter-filter
-        task.wait(0.8)
+        task.wait(0.35)
 
         -- STEP 2: Set qty (persis trade_input_test.lua)
         if qtyTextBox then
@@ -1032,7 +1032,7 @@ local function putSelectedItems(selectedItems)
             local qtyText = usesXPrefix and ("x" .. tostring(item.qty)) or tostring(item.qty)
             print("[PUT] STEP 2: Set qty = '" .. qtyText .. "'")
             setTradeTextBoxValue(qtyTextBox, qtyText, "qty")
-            task.wait(0.2)
+            task.wait(0.08)
         else
             warn("[PUT] qtyTextBox nil, skip qty setting")
         end
@@ -1043,7 +1043,7 @@ local function putSelectedItems(selectedItems)
         local nameLow = item.name:lower()
         local nameNoSp = nameLow:gsub("%s+", "")
 
-        local deadline = os.clock() + 3
+        local deadline = os.clock() + 1.4
         while os.clock() < deadline do
             for _, desc in ipairs(inventory:GetDescendants()) do
                 if desc:IsA("GuiButton") and isActuallyVisible(desc) then
@@ -1056,7 +1056,7 @@ local function putSelectedItems(selectedItems)
                 end
             end
             if itemBtn then break end
-            task.wait(0.2)
+            task.wait(0.08)
         end
 
         if not itemBtn then
@@ -1074,19 +1074,19 @@ local function putSelectedItems(selectedItems)
         else
             -- STEP 4: Klik item (persis trade_input_test.lua)
             print("[PUT] STEP 4: Klik item '" .. itemBtn.Name .. "'")
-            task.wait(0.1)
+            task.wait(0.04)
             local inset = game:GetService("GuiService"):GetGuiInset()
             local p, s = itemBtn.AbsolutePosition, itemBtn.AbsoluteSize
             local cx, cy = p.X + s.X / 2, p.Y + s.Y / 2 + inset.Y
             VIM_SERVICE:SendMouseMoveEvent(cx, cy, game)
-            task.wait(0.05)
+            task.wait(0.025)
             VIM_SERVICE:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-            task.wait(0.08)
+            task.wait(0.045)
             VIM_SERVICE:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-            task.wait(0.3)
+            task.wait(0.16)
         end
 
-        task.wait(0.15)
+        task.wait(0.06)
     end
 end
 
